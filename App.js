@@ -11,23 +11,24 @@ class Pomodoro extends React.Component {
     }
 
     tic = () => {
-        if (this.state.timerSeconds === 0) {
-            if (this.state.activity === 'WORK') {
+        const { activity, timerSeconds, workSeconds, breakSeconds } = this.state
+
+        if (timerSeconds === 0) {
+            if (activity === 'WORK') {
                 this.setState({
                     activity: 'BREAK',
-                    timerSeconds: this.state.breakSeconds
+                    timerSeconds: breakSeconds
                 })
             }
             else {
                 this.setState({
                     activity: 'WORK',
-                    timerSeconds: this.state.workSeconds
+                    timerSeconds: workSeconds
                 })
             }
         }
         else {
-            console.log('updating timer')
-            this.setState({ timerSeconds: this.state.timerSeconds - 1 })
+            this.setState({ timerSeconds: timerSeconds - 1 })
         }
     }
 
@@ -37,6 +38,29 @@ class Pomodoro extends React.Component {
 
     stopTimer = () => {
         clearInterval(this.interval)
+    }
+
+    handlePauseOrStart = () => {
+        const { buttonText } = this.state
+
+        if (buttonText === "PAUSE") {
+            this.stopTimer()
+            this.setState({ buttonText: "START" })
+        }
+        else {
+            this.startTimer()
+            this.setState({ buttonText: "PAUSE" })
+        }
+    }
+
+    handleReset = () => {
+        const { activity, workSeconds, breakSeconds } = this.state
+
+        this.stopTimer()
+        this.setState({
+            buttonText: "START",
+            timerSeconds: activity === "WORK" ? workSeconds : breakSeconds
+        })
     }
 
     componentDidMount() {
@@ -49,27 +73,37 @@ class Pomodoro extends React.Component {
     }
 
     get timerString() {
-        const minutes = Math.floor(this.state.timerSeconds/60)
+        const { timerSeconds } = this.state
+
+        const minutes = Math.floor(timerSeconds/60)
         const minutes_str = minutes.toString()
-        let seconds_str = (this.state.timerSeconds % 60).toString()
+        let seconds_str = (timerSeconds % 60).toString()
         seconds_str = seconds_str.length < 2 ? `0${seconds_str}` : seconds_str
         return `${minutes_str}:${seconds_str}`
     }
 
     render() {
+        const { state: { activity, buttonText },
+                handlePauseOrStart, handleReset, timerString } = this
         return (
             <View style={styles.mainContainer}>
                 <Text style={styles.title}>
-                    {`${this.state.activity} TIMER`}
+                    {`${activity} TIMER`}
                 </Text>
                 <Text style={styles.timer}>
-                    {this.timerString}
+                    {timerString}
                 </Text>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={this.stopTimer} style={styles.button}>
-                        <Text style={styles.buttonText}>{this.state.buttonText}</Text>
+                    <TouchableOpacity 
+                        style={styles.button}
+                        onPress={handlePauseOrStart}
+                    >
+                        <Text style={styles.buttonText}>{buttonText}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity 
+                        style={styles.button}
+                        onPress={handleReset}
+                    >
                         <Text style={styles.buttonText}>RESET</Text>
                     </TouchableOpacity>
                 </View>
