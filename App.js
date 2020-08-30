@@ -1,19 +1,24 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, 
+         TouchableOpacity, TextInput, Vibration } from 'react-native';
 
 class Pomodoro extends React.Component {
     state = {
         activity: 'WORK',
         buttonText: 'PAUSE',
-        workSeconds: 25 * 60,
-        breakSeconds: 5 * 60,
-        timerSeconds: 25 * 60
+        workUserMinutes: this.props.workMinutes,
+        workUserSeconds: 0,
+        breakUserMinutes: this.props.breakMinutes,
+        breakUserSeconds: 0,
+        timerSeconds: this.props.workMinutes * 60
     }
 
     tic = () => {
-        const { activity, timerSeconds, workSeconds, breakSeconds } = this.state
+        const { state: { activity, timerSeconds },
+                workSeconds, breakSeconds } = this
 
         if (timerSeconds === 0) {
+            Vibration.vibrate(0)
             if (activity === 'WORK') {
                 this.setState({
                     activity: 'BREAK',
@@ -54,7 +59,7 @@ class Pomodoro extends React.Component {
     }
 
     handleReset = () => {
-        const { activity, workSeconds, breakSeconds } = this.state
+        const { state: { activity }, workSeconds, breakSeconds } = this
 
         this.stopTimer()
         this.setState({
@@ -69,21 +74,32 @@ class Pomodoro extends React.Component {
 
     componentWillUnmount() {
         this.stopTimer()
-        console.log('unmounting')
     }
 
     get timerString() {
         const { timerSeconds } = this.state
 
-        const minutes = Math.floor(timerSeconds/60)
+        const minutes = Math.floor(timerSeconds / 60)
         const minutes_str = minutes.toString()
         let seconds_str = (timerSeconds % 60).toString()
         seconds_str = seconds_str.length < 2 ? `0${seconds_str}` : seconds_str
         return `${minutes_str}:${seconds_str}`
     }
 
+    get workSeconds() {
+        const { workUserMinutes, workUserSeconds } = this.state
+        
+        return workUserMinutes * 60 + workUserSeconds
+    }
+    
+    get breakSeconds() {
+        const { breakUserMinutes, breakUserSeconds } = this.state
+        
+        return breakUserMinutes * 60 + breakUserSeconds
+    }
+
     render() {
-        const { state: { activity, buttonText },
+        const { state: { activity, buttonText, workSeconds, breakSeconds },
                 handlePauseOrStart, handleReset, timerString } = this
         return (
             <View style={styles.mainContainer}>
@@ -106,6 +122,25 @@ class Pomodoro extends React.Component {
                     >
                         <Text style={styles.buttonText}>RESET</Text>
                     </TouchableOpacity>
+                {/* </View>
+                    <TextInput 
+                        value={Math.floor(workSeconds / 60).toString()}
+                        editable
+                    />
+                    <TextInput 
+                        value={(workSeconds % 60).toString()}
+                        editable
+                    />
+                    <TextInput 
+                        value={Math.floor(breakSeconds / 60).toString()}
+                        editable
+                    />
+                    <TextInput 
+                        value={(breakSeconds % 60).toString()}
+                        editable
+                    />
+                <View> */}
+
                 </View>
             </View>
         )
@@ -146,4 +181,6 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Pomodoro
+const App = () => <Pomodoro workMinutes={1} breakMinutes={1}/>
+
+export default App
