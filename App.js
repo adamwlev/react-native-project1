@@ -1,12 +1,12 @@
 import React from 'react'
-import { StyleSheet, Text, View, TouchableWithoutFeedback, 
+import { StyleSheet, Text, View, TouchableWithoutFeedback, KeyboardAvoidingView, 
          Keyboard, TouchableOpacity, Vibration } from 'react-native'
 import { IntInput } from './IntInput'
 
 class Pomodoro extends React.Component {
     state = {
         activity: 'WORK',
-        buttonText: 'PAUSE',
+        buttonText: 'START',
         workUserMinutes: this.props.workMinutes,
         workUserSeconds: 0,
         breakUserMinutes: this.props.breakMinutes,
@@ -74,7 +74,7 @@ class Pomodoro extends React.Component {
     }
 
     componentDidMount() {
-        this.startTimer()
+        //this.startTimer()
     }
 
     componentWillUnmount() {
@@ -108,62 +108,70 @@ class Pomodoro extends React.Component {
                          breakUserSeconds, workUserMinutes, workUserSeconds },
                 handlePauseOrStart, handleReset, handleInputChange, timerString } = this
         return (
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.mainContainer}>
-                    <Text style={styles.title}>
-                        {`${activity} TIMER`}
-                    </Text>
-                    <Text style={styles.timer}>
-                        {timerString}
-                    </Text>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity 
-                            style={styles.button}
-                            onPress={handlePauseOrStart}
-                        >
-                            <Text style={styles.buttonText}>{buttonText}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={styles.button}
-                            onPress={handleReset}
-                        >
-                            <Text style={styles.buttonText}>RESET</Text>
-                        </TouchableOpacity>
+            <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} style={styles.top}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={styles.mainContainer}>
+                        <Text style={styles.title}>
+                            {`${activity} TIMER`}
+                        </Text>
+                        <Text style={styles.timer}>
+                            {timerString}
+                        </Text>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity 
+                                style={styles.button}
+                                onPress={handlePauseOrStart}
+                            >
+                                <Text style={styles.buttonText}>{buttonText}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={styles.button}
+                                onPress={handleReset}
+                            >
+                                <Text style={styles.buttonText}>RESET</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View>
+                            <View style={styles.inputContainer}>
+                                <Text>Work Time:</Text>
+                                <IntInput
+                                    label="Minutes"
+                                    value={workUserMinutes}
+                                    onChange={(value) => handleInputChange("workUserMinutes",value)}
+                                />
+                                <IntInput
+                                    label="Seconds"
+                                    value={workUserSeconds}
+                                    onChange={(value) => handleInputChange("workUserSeconds",value)}
+                                />
+                            </View>
+                            <View style={styles.inputContainer}>
+                                <Text>Break Time:</Text>
+                                <IntInput
+                                    label="Minutes"
+                                    value={breakUserMinutes}
+                                    onChange={(value) => handleInputChange("breakUserMinutes",value)}
+                                />
+                                <IntInput
+                                    label="Seconds"
+                                    value={breakUserSeconds}
+                                    onChange={(value) => handleInputChange("breakUserSeconds",value)}
+                                />
+                            </View>
+                        </View>
+                        
                     </View>
-                    <View style={styles.inputContainer}>
-                        <Text>Work Time:</Text>
-                        <IntInput
-                            label="Minutes"
-                            value={workUserMinutes}
-                            onChange={(value) => handleInputChange("workUserMinutes",value)}
-                        />
-                        <IntInput
-                            label="Seconds"
-                            value={workUserSeconds}
-                            onChange={(value) => handleInputChange("workUserSeconds",value)}
-                        />
-                    </View>
-                    <View style={styles.inputContainer}>
-                        <Text>Break Time:</Text>
-                        <IntInput
-                            label="Minutes"
-                            value={breakUserMinutes}
-                            onChange={(value) => handleInputChange("breakUserMinutes",value)}
-                        />
-                        <IntInput
-                            label="Seconds"
-                            value={breakUserSeconds}
-                            onChange={(value) => handleInputChange("breakUserSeconds",value)}
-                        />
-                    </View>
-                </View>
-            </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
         )
     }
 
 }
 
 const styles = StyleSheet.create({
+    top : {
+        flex: 1,
+    },
     mainContainer: {
         flex: 1,
         backgroundColor: '#fff',
@@ -185,7 +193,7 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: '#00aeef',
         borderRadius: 5,
-        paddingHorizontal: 8,
+        paddingHorizontal: 15,
         marginHorizontal: 10,
         height: 40,
         alignItems: 'center',
@@ -202,6 +210,6 @@ const styles = StyleSheet.create({
     },
 })
 
-const App = () => <Pomodoro workMinutes={1} breakMinutes={1}/>
+const App = () => <Pomodoro workMinutes={25} breakMinutes={5}/>
 
 export default App

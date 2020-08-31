@@ -9,13 +9,14 @@ class IntInput extends React.Component {
     }
 
     onChange = (value) => {
-        const intValue = parseInt(value)
-        if (Number.isNaN(intValue)) {
-            this.setState({ value, error: true })
+        let intValue = parseInt(value)
+        if (!Number.isNaN(intValue) || (value.length === 0)) {
+            if (value.length === 0) intValue = 0
+            this.props.onChange(intValue)
+            this.setState({ value: value.length === 0 ? value : intValue, error: false })
         }
         else {
-            this.props.onChange(intValue)
-            this.setState({ value: intValue, error: false })
+            this.setState({ value, error: true })
         }
     }
     
